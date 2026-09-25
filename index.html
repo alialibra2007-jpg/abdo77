@@ -3,74 +3,132 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>خزنة الصحون</title>
+<title>خزنة الصحون والسيرفرات</title>
 <style>
 *{margin:0; padding:0; box-sizing:border-box;}
 body {font-family: Tahoma; background:#0f1117; color:#eee; padding:20px;}
 h1 {text-align:center; color:#667eea; margin-bottom:20px;}
-#search {width:100%; padding:12px 20px; border-radius:50px; border:2px solid #667eea; background:#1a1d24; color:#fff; font-size:16px; margin-bottom:20px;}
-.grid {display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px;}
+.tabs {display:flex; gap:10px; margin-bottom:20px;}
+.tab {flex:1; padding:12px; background:#1a1d24; border:none; color:#aaa; border-radius:10px; cursor:pointer; font-size:16px;}
+.tab.active {background:#667eea; color:white;}
+.tab-content {display:none;}
+.tab-content.active {display:block;}
+#search, #searchServer {width:100%; padding:12px 20px; border-radius:50px; border:2px solid #667eea; background:#1a1d24; color:#fff; font-size:16px; margin-bottom:20px;}
+.grid {display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:15px;}
 .card {background:#1a1d24; border-radius:15px; padding:15px; border:1px solid #2a2f3a;}
-.card img {width:100%; height:180px; object-fit:cover; border-radius:10px; margin-bottom:10px;}
-.card h3 {color:#667eea;}
-.ip {background:#0f1117; padding:8px; border-radius:8px; color:#25D366; font-family: monospace; direction:ltr;}
+.card h3 {color:#667eea; margin-bottom:8px;}
+.ip {background:#0f1117; padding:8px; border-radius:8px; color:#25D366; font-family: monospace; direction:ltr; margin:5px 0;}
 button {background:#667eea; color:white; border:none; padding:12px; border-radius:8px; width:100%; margin-top:10px; cursor:pointer;}
+.del {background:#c0392b; width:auto; padding:8px 15px; font-size:14px;}
 input {width:100%; padding:10px; margin:8px 0; background:#0f1117; border:1px solid #333; color:#fff; border-radius:8px;}
 .add-form {background:#1a1d24; padding:20px; border-radius:15px; margin-top:20px;}
 </style>
 </head>
 <body>
 
-<h1>🔒 خزنة الصحون والسيرفرات</h1>
-<input type="text" id="search" placeholder="ابحث باسم الصحن او المكان...">
+<h1>🔒 الخزنة</h1>
 
-<div class="grid" id="grid"></div>
+<div class="tabs">
+  <button class="tab active" onclick="showTab('dishes')">📡 الصحون</button>
+  <button class="tab" onclick="showTab('servers')">🖥️ السيرفرات</button>
+</div>
 
-<div class="add-form">
-<h3>اضافة صحن جديد</h3>
-<input type="text" id="dishName" placeholder="اسم الصحن">
-<input type="text" id="dishIP" placeholder="الاي بي: 192.168.1.1">
-<input type="text" id="dishLocation" placeholder="المكان: سطح البيت - حلب">
-<input type="file" id="dishImg" accept="image/*">
-<button onclick="addDish()">حفظ الصحن</button>
+<!-- تبويب الصحون -->
+<div id="dishes" class="tab-content active">
+  <input type="text" id="search" placeholder="ابحث باسم الصحن او المكان...">
+  <div class="grid" id="gridDishes"></div>
+  <div class="add-form">
+    <h3>اضافة صحن جديد</h3>
+    <input type="text" id="dishName" placeholder="اسم الصحن">
+    <input type="text" id="dishIP" placeholder="الاي بي: 192.168.1.1">
+    <input type="text" id="dishLocation" placeholder="المكان: سطح البيت - حلب">
+    <button onclick="addDish()">حفظ الصحن</button>
+  </div>
+</div>
+
+<!-- تبويب السيرفرات -->
+<div id="servers" class="tab-content">
+  <input type="text" id="searchServer" placeholder="ابحث باسم السيرفر او المكان...">
+  <div class="grid" id="gridServers"></div>
+  <div class="add-form">
+    <h3>اضافة سيرفر جديد</h3>
+    <input type="text" id="serverName" placeholder="اسم السيرفر">
+    <input type="text" id="serverIP" placeholder="الاي بي: 10.0.0.5">
+    <input type="text" id="serverLocation" placeholder="المكان: غرفة السيرفرات">
+    <button onclick="addServer()">حفظ السيرفر</button>
+  </div>
 </div>
 
 <script>
 let dishes = JSON.parse(localStorage.getItem('dishes') || '[]');
+let servers = JSON.parse(localStorage.getItem('servers') || '[]');
 
-function render(list = dishes){
-  document.getElementById('grid').innerHTML = list.map((d,i)=>`
+function showTab(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function renderDishes(list = dishes){
+  document.getElementById('gridDishes').innerHTML = list.map((d,i)=>`
     <div class="card">
-      <img src="${d.img}">
-      <h3>${d.name}</h3>
+      <h3>📡 ${d.name}</h3>
       <p><b>الاي بي:</b> <div class="ip">${d.ip}</div></p>
       <p><b>المكان:</b> ${d.location}</p>
-      <button onclick="delDish(${i})" style="background:#c0392b;">حذف</button>
+      <button class="del" onclick="delDish(${i})">حذف</button>
     </div>
   `).join('');
 }
 
+function renderServers(list = servers){
+  document.getElementById('gridServers').innerHTML = list.map((s,i)=>`
+    <div class="card">
+      <h3>🖥️ ${s.name}</h3>
+      <p><b>الاي بي:</b> <div class="ip">${s.ip}</div></p>
+      <p><b>المكان:</b> ${s.location}</p>
+      <button class="del" onclick="delServer(${i})">حذف</button>
+    </div>
+  `).join('');
+}
+
+// بحث الصحون
 document.getElementById('search').onkeyup = function(){
   let val = this.value.toLowerCase();
-  render(dishes.filter(d => d.name.toLowerCase().includes(val) || d.location.toLowerCase().includes(val) || d.ip.toLowerCase().includes(val)));
+  renderDishes(dishes.filter(d => d.name.toLowerCase().includes(val) || d.location.toLowerCase().includes(val) || d.ip.toLowerCase().includes(val)));
+}
+
+// بحث السيرفرات
+document.getElementById('searchServer').onkeyup = function(){
+  let val = this.value.toLowerCase();
+  renderServers(servers.filter(s => s.name.toLowerCase().includes(val) || s.location.toLowerCase().includes(val) || s.ip.toLowerCase().includes(val)));
 }
 
 function addDish(){
-  let name = dishName.value; let ip = dishIP.value; let location = dishLocation.value; let file = dishImg.files[0];
-  if(!name ||!ip ||!location ||!file){ alert('عبي كل الحقول'); return; }
-  let reader = new FileReader();
-  reader.onload = function(e){
-    dishes.push({name, ip, location, img:e.target.result});
-    localStorage.setItem('dishes', JSON.stringify(dishes));
-    render();
-    dishName.value=''; dishIP.value=''; dishLocation.value=''; dishImg.value='';
-    alert('تم الحفظ');
-  }
-  reader.readAsDataURL(file);
+  let name = dishName.value; let ip = dishIP.value; let location = dishLocation.value;
+  if(!name ||!ip ||!location){ alert('عبي كل الحقول'); return; }
+  dishes.push({name, ip, location});
+  localStorage.setItem('dishes', JSON.stringify(dishes));
+  renderDishes(); 
+  dishName.value=''; dishIP.value=''; dishLocation.value='';
+  alert('تم حفظ الصحن');
 }
 
-function delDish(i){ if(confirm('متأكد؟')){ dishes.splice(i,1); localStorage.setItem('dishes', JSON.stringify(dishes)); render(); } }
-render();
+function addServer(){
+  let name = serverName.value; let ip = serverIP.value; let location = serverLocation.value;
+  if(!name ||!ip ||!location){ alert('عبي كل الحقول'); return; }
+  servers.push({name, ip, location});
+  localStorage.setItem('servers', JSON.stringify(servers));
+  renderServers();
+  serverName.value=''; serverIP.value=''; serverLocation.value='';
+  alert('تم حفظ السيرفر');
+}
+
+function delDish(i){ if(confirm('متأكد؟')){ dishes.splice(i,1); localStorage.setItem('dishes', JSON.stringify(dishes)); renderDishes(); } }
+function delServer(i){ if(confirm('متأكد؟')){ servers.splice(i,1); localStorage.setItem('servers', JSON.stringify(servers)); renderServers(); } }
+
+renderDishes();
+renderServers();
 </script>
 </body>
 </html>
