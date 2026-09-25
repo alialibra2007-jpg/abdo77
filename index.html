@@ -18,10 +18,10 @@ h1 {text-align:center; color:#667eea; font-size:32px; margin-bottom:10px; text-s
 .subtitle {text-align:center; color:#aaa; margin-bottom:30px;}
 
 .tabs {display:flex; gap:15px; margin-bottom:30px; flex-wrap:wrap;}
-.tab {flex:1; min-width:180px; padding:20px; background:linear-gradient(135deg,#1a1d24,#222838); border:2px solid #333; color:#aaa; border-radius:20px; cursor:pointer; font-size:18px; font-weight:bold; text-align:center; transition:0.3s;}
+.tab {flex:1; min-width:200px; padding:20px; background:linear-gradient(135deg,#1a1d24,#222838); border:2px solid #333; color:#aaa; border-radius:20px; cursor:pointer; font-size:18px; font-weight:bold; text-align:center; transition:0.3s;}
 .tab:hover {transform:translateY(-5px); border-color:#667eea;}
 .tab.active {background:linear-gradient(135deg,#667eea,#764ba2); color:white; border-color:#667eea; box-shadow:0 0 30px rgba(102,126,234,0.5);}
-.tab span {display:block; font-size:12px; font-weight:normal; margin-top:5px;}
+.tab span {display:block; font-size:13px; font-weight:normal; margin-top:5px;}
 
 .tab-content {display:none;}
 .tab-content.active {display:block;}
@@ -35,24 +35,26 @@ h1 {text-align:center; color:#667eea; font-size:32px; margin-bottom:10px; text-s
 .card-details {display:none; margin-top:15px; padding-top:15px; border-top:1px solid #333;}
 .card.active .card-details {display:block;}
 .ip {background:#0f1117; padding:10px; border-radius:8px; color:#25D366; font-family: monospace; direction:ltr; margin:8px 0; font-size:16px;}
-.stats {display:flex; gap:10px; margin:10px 0;}
-.stat {flex:1; background:#0f1117; padding:10px; border-radius:8px; text-align:center;}
-.stat b {color:#667eea; display:block; font-size:22px;}
+.stat {display:flex; justify-content:space-between; padding:8px 0;}
+.stat b {color:#667eea;}
 button {background:#667eea; color:white; border:none; padding:15px; border-radius:10px; width:100%; margin-top:15px; cursor:pointer; font-size:16px; font-weight:bold;}
-.del {background:#c0392b; width:auto; padding:10px 20px; font-size:14px;}
-.smoke-btn {background:#27ae60; padding:8px 15px; width:auto; margin:5px;}
+.btn-sm {padding:8px 12px; font-size:14px; width:auto; margin:5px;}
+.del {background:#c0392b;}
+.green {background:#27ae60;}
 input {width:100%; padding:12px; margin:10px 0; background:#0f1117; border:1px solid #333; color:#fff; border-radius:10px; font-size:16px;}
 .add-form {background:#1a1d24; padding:25px; border-radius:20px; margin-top:25px; border:1px solid #2a2f3a;}
 .add-form h3 {color:#667eea; margin-bottom:15px;}
 .arrow {transition:0.3s; display:inline-block;}
 .card.active .arrow {transform:rotate(90deg);}
+.progress {background:#0f1117; height:20px; border-radius:10px; overflow:hidden; margin:10px 0;}
+.progress-bar {background:#27ae60; height:100%; transition:0.3s; text-align:center; line-height:20px; font-size:12px;}
 </style>
 </head>
 <body>
 <div class="container">
 
 <h1>شركة دلتا</h1>
-<p class="subtitle">نظام الادارة</p>
+<p class="subtitle">نظام الادارة الشامل</p>
 
 <div class="tabs">
   <button class="tab active" id="tabDishes" onclick="showTab('dishes')">
@@ -64,8 +66,8 @@ input {width:100%; padding:12px; margin:10px 0; background:#0f1117; border:1px s
     <span>ادارة السيرفرات والايبيات</span>
   </button>
   <button class="tab" id="tabCigs" onclick="showTab('cigs')">
-    🚬 الدخان
-    <span>متابعة الباكيتات</span>
+    🚬 باكيت الدخان
+    <span>تتبع الاستهلاك</span>
   </button>
 </div>
 
@@ -95,16 +97,16 @@ input {width:100%; padding:12px; margin:10px 0; background:#0f1117; border:1px s
   </div>
 </div>
 
-<!-- تبويب الدخان -->
+<!-- تبويب باكيت الدخان -->
 <div id="cigs" class="tab-content">
   <input type="text" id="searchCig" placeholder="ابحث باسم الباكيت...">
   <div class="grid" id="gridCigs"></div>
   <div class="add-form">
     <h3>اضافة باكيت جديد</h3>
-    <input type="text" id="cigName" placeholder="اسم الباكيت: ميريت ازرق">
-    <input type="number" id="cigTotal" placeholder="عدد السكاير بالباكيت: 20">
-    <input type="number" id="cigPrice" placeholder="السعر: 50000 ل.س">
-    <button onclick="addCig()">+ فتح باكيت جديد</button>
+    <input type="text" id="cigName" placeholder="اسم الباكيت: مثلا مارلبورو">
+    <input type="number" id="cigBought" placeholder="شقد اشتريتها؟ عدد السكاير" value="20">
+    <input type="number" id="cigSmoked" placeholder="كم سكارة دخنت؟" value="0">
+    <button onclick="addCig()">+ اضافة الباكيت</button>
   </div>
 </div>
 
@@ -135,54 +137,11 @@ function showTab(id){
   }
 }
 
-function toggleCard(card){
-  card.classList.toggle('active');
-}
+function toggleCard(card){ card.classList.toggle('active'); }
 
 function renderDishes(list = dishes){
   document.getElementById('gridDishes').innerHTML = list.map((d,i)=>`
     <div class="card" onclick="toggleCard(this)">
-      <div class="card-header">
-        <h3>📡 ${d.name}</h3>
-        <span class="arrow">▶</span>
-      </div>
+      <div class="card-header"><h3>📡 ${d.name}</h3><span class="arrow">▶</span></div>
       <div class="card-details">
-        <p><b>الاي بي:</b> <div class="ip">${d.ip}</div></p>
-        <p><b>المكان:</b> ${d.location}</p>
-        <button class="del" onclick="event.stopPropagation(); delDish(${i})">حذف</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-function renderServers(list = servers){
-  document.getElementById('gridServers').innerHTML = list.map((s,i)=>`
-    <div class="card" onclick="toggleCard(this)">
-      <div class="card-header">
-        <h3>🖥️ ${s.name}</h3>
-        <span class="arrow">▶</span>
-      </div>
-      <div class="card-details">
-        <p><b>الاي بي:</b> <div class="ip">${s.ip}</div></p>
-        <p><b>المكان:</b> ${s.location}</p>
-        <button class="del" onclick="event.stopPropagation(); delServer(${i})">حذف</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-function renderCigs(list = cigs){
-  document.getElementById('gridCigs').innerHTML = list.map((c,i)=>`
-    <div class="card" onclick="toggleCard(this)">
-      <div class="card-header">
-        <h3>🚬 ${c.name}</h3>
-        <span class="arrow">▶</span>
-      </div>
-      <div class="card-details">
-        <div class="stats">
-          <div class="stat"><b>${c.total}</b>اشتريت</div>
-          <div class="stat"><b>${c.smoked}</b>دخنت</div>
-          <div class="stat"><b>${c.total - c.smoked}</b>باقي</div>
-        </div>
-        <p><b>السعر:</b> ${c.price} ل.س</p>
-        <button class="smoke-btn" onclick="event.stopPropagation(); smoke
+        <p><b>الاي بي:</b
