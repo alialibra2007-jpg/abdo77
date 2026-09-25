@@ -1,149 +1,22 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر الموظفين</title>
-    <style>
-        * {margin: 0; padding: 0; box-sizing: border-box;}
-        body {
-            font-family: 'Tahoma', sans-serif;
-            background: #f4f4f9;
-            color: #333;
-        }
-        header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px 20px;
-            text-align: center;
-        }
-        header h1 {font-size: 35px; margin-bottom: 10px;}
-       .search-box {margin-top: 20px;}
-       .search-box input {
-            padding: 12px 20px;
-            width: 80%;
-            max-width: 400px;
-            border: none;
-            border-radius: 50px;
-            font-size: 16px;
-        }
-       .container {max-width: 1200px; margin: 40px auto; padding: 20px;}
-       .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-        }
-       .card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: 0.3s;
-            cursor: pointer;
-        }
-       .card:hover {transform: translateY(-5px);}
-       .card img {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 15px;
-            border: 4px solid #667eea;
-        }
-       .card h3 {color: #667eea; margin-bottom: 5px;}
-       .card.job {color: #777; margin-bottom: 10px;}
-       .card.price {font-size: 20px; font-weight: bold; color: #25D366;}
-       .card.btn {
-            display: inline-block;
-            background: #25D366;
-            color: white;
-            padding: 10px 25px;
-            border-radius: 50px;
-            text-decoration: none;
-            margin-top: 10px;
-        }
-       .employee-page {display: none; background: white; padding: 40px; border-radius: 20px; max-width: 800px; margin: 40px auto;}
-       .back-btn {background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer; margin-bottom: 20px;}
-       .employee-page img {width: 200px; height: 200px; border-radius: 50%; border: 5px solid #667eea;}
-    </style>
-</head>
-<body>
-
-<header>
-    <h1>متجر الموظفين</h1>
-    <p>اختر الموظف المناسب لشغلك</p>
-    <div class="search-box">
-        <input type="text" id="searchInput" placeholder="ابحث عن اسم الموظف...">
-    </div>
-</header>
-
-<div class="container">
-    <div id="mainPage">
-        <div class="grid" id="employeeGrid">
-            <div class="card" onclick="showEmployee(1)">
-                <img src="https://via.placeholder.com/150" alt="احمد">
-                <h3>احمد علي</h3>
-                <p class="job">مصمم جرافيك</p>
-                <p class="price">50$ / الساعة</p>
-                <a href="https://wa.me/963" class="btn">تواصل واتساب</a>
-            </div>
-            <div class="card" onclick="showEmployee(2)">
-                <img src="https://via.placeholder.com/150" alt="سارة">
-                <h3>سارة محمد</h3>
-                <p class="job">مبرمجة مواقع</p>
-                <p class="price">70$ / الساعة</p>
-                <a href="https://wa.me/963" class="btn">تواصل واتساب</a>
-            </div>
-            <div class="card" onclick="showEmployee(3)">
-                <img src="https://via.placeholder.com/150" alt="خالد">
-                <h3>خالد حسن</h3>
-                <p class="job">مصور فوتوغرافي</p>
-                <p class="price">40$ / الساعة</p>
-                <a href="https://wa.me/963" class="btn">تواصل واتساب</a>
-            </div>
-        </div>
-    </div>
-
-    <div id="employeePage" class="employee-page">
-        <button class="back-btn" onclick="goBack()">← الرجوع</button>
-        <div id="employeeDetails"></div>
-    </div>
-</div>
-
-<script>
-const employees = {
-    1: {name: "احمد علي", job: "مصمم جرافيك", price: "50$ / الساعة", img: "https://via.placeholder.com/200", bio: "مصمم محترف بخبرة 5 سنوات", whatsapp: "963"},
-    2: {name: "سارة محمد", job: "مبرمجة مواقع", price: "70$ / الساعة", img: "https://via.placeholder.com/200", bio: "مبرمجة مواقع وتطبيقات", whatsapp: "963"},
-    3: {name: "خالد حسن", job: "مصور فوتوغرافي", price: "40$ / الساعة", img: "https://via.placeholder.com/200", bio: "مصور محترف لحفلات ومنتجات", whatsapp: "963"}
-};
-function showEmployee(id) {
-    document.getElementById('mainPage').style.display = 'none';
-    document.getElementById('employeePage').style.display = 'block';
-    const emp = employees[id];
-    document.getElementById('employeeDetails').innerHTML = `
-        <img src="${emp.img}" alt="${emp.name}">
-        <h2>${emp.name}</h2>
-        <h3 style="color:#667eea">${emp.job}</h3>
-        <h2 style="color:#25D366; margin:15px 0">${emp.price}</h2>
-        <p style="font-size:18px; line-height:1.8">${emp.bio}</p>
-        <a href="https://wa.me/${emp.whatsapp}" class="btn" style="background:#25D366; color:white; padding:15px 40px; display:inline-block; margin-top:20px; text-decoration:none; border-radius:50px;">📱 تواصل مع ${emp.name}</a>
-    `;
-}
-function goBack() {
-    document.getElementById('mainPage').style.display = 'block';
-    document.getElementById('employeePage').style.display = 'none';
-}
-document.getElementById('searchInput').addEventListener('keyup', function() {
-    let filter = this.value.toLowerCase();
-    let cards = document.querySelectorAll('.card');
-    cards.forEach(card => {
-        let name = card.querySelector('h3').innerText.toLowerCase();
-        card.style.display = name.includes(filter)? '' : 'none';
-    });
-});
-</script>
-
-</body>
-</html>
+<meta charset="UTF-8">
+<title>خزنة الصحون والسيرفرات</title>
+<style>
+  *{margin:0; padding:0; box-sizing:border-box;}
+  body {font-family: Tahoma; background:#0f1117; color:#eee; padding:20px;}
+  header {text-align:center; margin-bottom:20px;}
+  header h1 {color:#667eea;}
+  .search-box {text-align:center; margin:20px 0;}
+  .search-box input {width:90%; max-width:500px; padding:12px 20px; border-radius:50px; border:2px solid #667eea; background:#1a1d24; color:#fff; font-size:16px;}
+  .grid {display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px;}
+  .card {background:#1a1d24; border-radius:15px; padding:15px; border:1px solid #2a2f3a; transition:0.3s;}
+  .card:hover {border-color:#667eea; transform:translateY(-3px);}
+  .card img {width:100%; height:180px; object-fit:cover; border-radius:10px; margin-bottom:10px;}
+  .card h3 {color:#667eea; margin-bottom:5px;}
+  .info {margin:8px 0; font-size:15px;}
+  .info span {color:#aaa;}
+  .ip {background:#0f1117; padding:8px; border-radius:8px; color:#25D366; font-family: monospace; direction:ltr; text-align:left;}
+  .add-btn {position:fixed; bottom:20px; left:20px; background:#667eea; color:white; border:none; padding:15px 25px; border-radius:50px; font-size:16px; cursor:pointer;}
+  .modal {display:none; position:fixed; top:0; left:0; width:100%; height:
