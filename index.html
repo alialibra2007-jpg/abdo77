@@ -2,21 +2,75 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>خزنة الصحون والسيرفرات</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>خزنة الصحون</title>
 <style>
-  *{margin:0; padding:0; box-sizing:border-box;}
-  body {font-family: Tahoma; background:#0f1117; color:#eee; padding:20px;}
-  header {text-align:center; margin-bottom:20px;}
-  header h1 {color:#667eea;}
-  .search-box {text-align:center; margin:20px 0;}
-  .search-box input {width:90%; max-width:500px; padding:12px 20px; border-radius:50px; border:2px solid #667eea; background:#1a1d24; color:#fff; font-size:16px;}
-  .grid {display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px;}
-  .card {background:#1a1d24; border-radius:15px; padding:15px; border:1px solid #2a2f3a; transition:0.3s;}
-  .card:hover {border-color:#667eea; transform:translateY(-3px);}
-  .card img {width:100%; height:180px; object-fit:cover; border-radius:10px; margin-bottom:10px;}
-  .card h3 {color:#667eea; margin-bottom:5px;}
-  .info {margin:8px 0; font-size:15px;}
-  .info span {color:#aaa;}
-  .ip {background:#0f1117; padding:8px; border-radius:8px; color:#25D366; font-family: monospace; direction:ltr; text-align:left;}
-  .add-btn {position:fixed; bottom:20px; left:20px; background:#667eea; color:white; border:none; padding:15px 25px; border-radius:50px; font-size:16px; cursor:pointer;}
-  .modal {display:none; position:fixed; top:0; left:0; width:100%; height:
+*{margin:0; padding:0; box-sizing:border-box;}
+body {font-family: Tahoma; background:#0f1117; color:#eee; padding:20px;}
+h1 {text-align:center; color:#667eea; margin-bottom:20px;}
+#search {width:100%; padding:12px 20px; border-radius:50px; border:2px solid #667eea; background:#1a1d24; color:#fff; font-size:16px; margin-bottom:20px;}
+.grid {display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px;}
+.card {background:#1a1d24; border-radius:15px; padding:15px; border:1px solid #2a2f3a;}
+.card img {width:100%; height:180px; object-fit:cover; border-radius:10px; margin-bottom:10px;}
+.card h3 {color:#667eea;}
+.ip {background:#0f1117; padding:8px; border-radius:8px; color:#25D366; font-family: monospace; direction:ltr;}
+button {background:#667eea; color:white; border:none; padding:12px; border-radius:8px; width:100%; margin-top:10px; cursor:pointer;}
+input {width:100%; padding:10px; margin:8px 0; background:#0f1117; border:1px solid #333; color:#fff; border-radius:8px;}
+.add-form {background:#1a1d24; padding:20px; border-radius:15px; margin-top:20px;}
+</style>
+</head>
+<body>
+
+<h1>🔒 خزنة الصحون والسيرفرات</h1>
+<input type="text" id="search" placeholder="ابحث باسم الصحن او المكان...">
+
+<div class="grid" id="grid"></div>
+
+<div class="add-form">
+<h3>اضافة صحن جديد</h3>
+<input type="text" id="dishName" placeholder="اسم الصحن">
+<input type="text" id="dishIP" placeholder="الاي بي: 192.168.1.1">
+<input type="text" id="dishLocation" placeholder="المكان: سطح البيت - حلب">
+<input type="file" id="dishImg" accept="image/*">
+<button onclick="addDish()">حفظ الصحن</button>
+</div>
+
+<script>
+let dishes = JSON.parse(localStorage.getItem('dishes') || '[]');
+
+function render(list = dishes){
+  document.getElementById('grid').innerHTML = list.map((d,i)=>`
+    <div class="card">
+      <img src="${d.img}">
+      <h3>${d.name}</h3>
+      <p><b>الاي بي:</b> <div class="ip">${d.ip}</div></p>
+      <p><b>المكان:</b> ${d.location}</p>
+      <button onclick="delDish(${i})" style="background:#c0392b;">حذف</button>
+    </div>
+  `).join('');
+}
+
+document.getElementById('search').onkeyup = function(){
+  let val = this.value.toLowerCase();
+  render(dishes.filter(d => d.name.toLowerCase().includes(val) || d.location.toLowerCase().includes(val) || d.ip.toLowerCase().includes(val)));
+}
+
+function addDish(){
+  let name = dishName.value; let ip = dishIP.value; let location = dishLocation.value; let file = dishImg.files[0];
+  if(!name ||!ip ||!location ||!file){ alert('عبي كل الحقول'); return; }
+  let reader = new FileReader();
+  reader.onload = function(e){
+    dishes.push({name, ip, location, img:e.target.result});
+    localStorage.setItem('dishes', JSON.stringify(dishes));
+    render();
+    dishName.value=''; dishIP.value=''; dishLocation.value=''; dishImg.value='';
+    alert('تم الحفظ');
+  }
+  reader.readAsDataURL(file);
+}
+
+function delDish(i){ if(confirm('متأكد؟')){ dishes.splice(i,1); localStorage.setItem('dishes', JSON.stringify(dishes)); render(); } }
+render();
+</script>
+</body>
+</html>
